@@ -19,7 +19,60 @@
 				"command": "compare-helper.helloWorld",
 				"title": "Hello World"
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Compare Helper",
+			"properties": {
+				"compareHelper.defaultExternalTools": {
+					"type": "object",
+					"properties": {
+						"folders": {
+							"type": "string"
+						},
+						"images": {
+							"type": "string"
+						},
+						"text": {
+							"type": "string"
+						}
+					},
+					"default": {
+						"folders": "",
+						"images": "",
+						"text": ""
+					},
+					"additionalProperties": false,
+					"markdownDescription": "Use value of the `name` property. See `#compareHelper.externalTools#`"
+				},
+				"compareHelper.externalTools": {
+					"type":"array",
+					"description": "A list of available external tools and their configurations",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": { "type": "string" },
+							"path": { "type": "string" },
+							"args": { 
+								"type": "array",
+								"items": { "type": "string" }
+							},
+							"compares": {
+								"type": "array",
+								"uniqueItems": true,
+								"maxItems": 3,
+								"items": {
+									"type": "string",
+									"enum": ["folders", "images", "text"]
+								}
+							}
+						},
+						"required": ["name", "path", "args", "compares"],
+						"additionalProperties": false
+					}
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
