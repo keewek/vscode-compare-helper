@@ -1,0 +1,52 @@
+// Example configuration
+
+{
+    "compareHelper.defaultExternalTool.folders": "Meld",
+    "compareHelper.defaultExternalTool.imageFiles": "p4merge",
+    "compareHelper.defaultExternalTool.textFiles": "p4merge",
+    "compareHelper.externalTools": [
+        {
+            "name": "p4merge",
+            "path": "C:\\Program\\ Files\\Perforce\\p4merge.exe",
+            "args": [
+                "${FOLDER_ITEM_1}", // Base
+                "${FOLDER_ITEM_2}", // Left
+                "${FOLDER_ITEM_3}", // Right
+                "${FOLDER_ITEM_4}"  // Merge
+            ],
+            "compares": {
+                "text": true,
+                "images": true,
+                "folders": false
+            }
+        },
+        {
+            "name": "Meld",
+            "path": "C:\\Program\\ Files\\ \\(x86\\)\\Meld\\Meld.exe",
+            "args": [
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}",
+                "${FOLDER_ITEM_3}"
+            ],
+            "compares": {
+                "text": true,
+                "images": false,
+                "folders": true
+            }
+        },
+        {
+            "name": "KDiff3",
+            "path": "C:\\Program\\ Files\\kdiff3\\bin\\kdiff3.exe",
+            "args": [
+                "${FOLDER_ITEM_1}", // Base
+                "${FOLDER_ITEM_2}", // Left
+                "${FOLDER_ITEM_3}"  // Right
+            ],
+            "compares": {
+                "text": true,
+                "images": false,
+                "folders": true
+            }
+        }
+    ]
+}
