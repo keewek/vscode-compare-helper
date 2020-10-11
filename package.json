@@ -21,19 +21,29 @@
 			}
 		],
 		"configuration": {
+			"type": "object",
 			"title": "Compare Helper",
 			"properties": {
-				"compareHelper.defaultExternalTool.textFiles": {
-					"type": "string",
-					"markdownDescription": "Default external tool for text files. Use value of the `name` property. See `#compareHelper.externalTools#`"
-				},
-				"compareHelper.defaultExternalTool.imageFiles": {
-					"type": "string",
-					"markdownDescription": "Default external tool for image files. Use value of the `name` property. See `#compareHelper.externalTools#`"
-				},
-				"compareHelper.defaultExternalTool.folders": {
-					"type": "string",
-					"markdownDescription": "Default external tool for folders. Use value of the `name` property. See `#compareHelper.externalTools#`"
+				"compareHelper.defaultExternalTools": {
+					"type": "object",
+					"properties": {
+						"folders": {
+							"type": "string"
+						},
+						"images": {
+							"type": "string"
+						},
+						"text": {
+							"type": "string"
+						}
+					},
+					"default": {
+						"folders": "",
+						"images": "",
+						"text": ""
+					},
+					"additionalProperties": false,
+					"markdownDescription": "Use value of the `name` property. See `#compareHelper.externalTools#`"
 				},
 				"compareHelper.externalTools": {
 					"type":"array",
@@ -48,13 +58,13 @@
 								"items": { "type": "string" }
 							},
 							"compares": {
-								"type": "object",
-								"properties": {
-									"text": { "type": "boolean" },
-									"images": { "type": "boolean" },
-									"folders": { "type": "boolean" }
-								},
-								"additionalProperties": false
+								"type": "array",
+								"uniqueItems": true,
+								"maxItems": 3,
+								"items": {
+									"type": "string",
+									"enum": ["folders", "images", "text"]
+								}
 							}
 						},
 						"required": ["name", "path", "args", "compares"],
