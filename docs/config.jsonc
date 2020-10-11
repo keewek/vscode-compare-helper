@@ -1,9 +1,11 @@
 // Example configuration
 
 {
-    "compareHelper.defaultExternalTool.folders": "Meld",
-    "compareHelper.defaultExternalTool.imageFiles": "p4merge",
-    "compareHelper.defaultExternalTool.textFiles": "p4merge",
+    "compareHelper.defaultExternalTools": {
+        "folders": "Meld",
+        "images": "p4merge",
+        "text": "p4merge"
+    },
     "compareHelper.externalTools": [
         {
             "name": "p4merge",
@@ -14,11 +16,7 @@
                 "${FOLDER_ITEM_3}", // Right
                 "${FOLDER_ITEM_4}"  // Merge
             ],
-            "compares": {
-                "text": true,
-                "images": true,
-                "folders": false
-            }
+            "compares": ["images", "text"]
         },
         {
             "name": "Meld",
@@ -28,11 +26,7 @@
                 "${FOLDER_ITEM_2}",
                 "${FOLDER_ITEM_3}"
             ],
-            "compares": {
-                "text": true,
-                "images": false,
-                "folders": true
-            }
+            "compares": ["folders", "text"]
         },
         {
             "name": "KDiff3",
@@ -42,11 +36,7 @@
                 "${FOLDER_ITEM_2}", // Left
                 "${FOLDER_ITEM_3}"  // Right
             ],
-            "compares": {
-                "text": true,
-                "images": false,
-                "folders": true
-            }
+            "compares": ["folders", "text"]
         }
     ]
 }
