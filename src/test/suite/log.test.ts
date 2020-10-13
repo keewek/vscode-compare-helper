@@ -10,6 +10,10 @@ class Channel {
     appendLine(value: string): void {
         this.value = value;
     }
+
+    append(value: string): void {
+        this.value = value;
+    }
 }
 
 suite('Log Test Suite', function () {
@@ -22,6 +26,48 @@ suite('Log Test Suite', function () {
             log = new Log.ChannelLogger(channel as unknown as OutputChannel);
         });
     
+        test('Append object', function() {
+            const expected = "[\n  {\n    \"char\": \"A\",\n    \"num\": 1\n  },\n  {\n    \"char\": \"B\",\n    \"num\": 2\n  }\n]";
+            let data = [
+                { char: 'A', num: 1},
+                { char: 'B', num: 2},
+            ];
+
+            log.append(data);
+
+            assert.strictEqual(channel.value, expected);
+        });
+
+        test('Append string', function() {
+            const expected = "Test";
+            let data = 'Test';
+
+            log.append(data);
+
+            assert.strictEqual(channel.value, expected);
+        });
+
+        test('Append object with prefix', function() {
+            const expected = "  |  [\n  |    {\n  |      \"char\": \"A\",\n  |      \"num\": 1\n  |    },\n  |    {\n  |      \"char\": \"B\",\n  |      \"num\": 2\n  |    }\n  |  ]";
+            let data = [
+                { char: 'A', num: 1},
+                { char: 'B', num: 2},
+            ];
+
+            log.append(data, '  |  ');
+
+            assert.strictEqual(channel.value, expected);
+        });
+
+        test('Append string with prefix', function() {
+            const expected = "  |  Test";
+            let data = 'Test';
+
+            log.append(data, '  |  ');
+
+            assert.strictEqual(channel.value, expected);
+        });
+
         test('Error', function() {
             const regex = /^\[.+ - (\d{2}:\d{2}:\d{2})\] .+$/u;
             let time: string;
