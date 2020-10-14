@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { before, test } from 'mocha';
+import { beforeEach, test } from 'mocha';
 
 import { OutputChannel } from 'vscode';
 import * as Log from '../../log';
@@ -20,8 +20,8 @@ suite('Log Test Suite', function () {
     suite('ChannelLogger', function() {
         let log: Log.Logger;
         let channel: Channel;
-        
-        before(function() {
+                
+        beforeEach(function() {
             channel = new Channel();
             log = new Log.ChannelLogger(channel as unknown as OutputChannel);
         });
@@ -121,5 +121,54 @@ suite('Log Test Suite', function () {
     
             assert.strictEqual(channel.value, expected);
         });
+
+        test("Error's count", function() {
+            log.error('message');
+            assert.strictEqual(log.count.error, 1);
+            assert.strictEqual(log.count.info, 0);
+            assert.strictEqual(log.count.warn, 0);
+
+            log.error('message');
+            assert.strictEqual(log.count.error, 2);
+            assert.strictEqual(log.count.info, 0);
+            assert.strictEqual(log.count.warn, 0);
+        });
+
+        test("Info's count", function() {
+            log.info('message');
+            assert.strictEqual(log.count.error, 0);
+            assert.strictEqual(log.count.info, 1);
+            assert.strictEqual(log.count.warn, 0);
+
+            log.info('message');
+            assert.strictEqual(log.count.error, 0);
+            assert.strictEqual(log.count.info, 2);
+            assert.strictEqual(log.count.warn, 0);
+        });
+
+        test("Warn's count", function() {
+            log.warn('message');
+            assert.strictEqual(log.count.error, 0);
+            assert.strictEqual(log.count.info, 0);
+            assert.strictEqual(log.count.warn, 1);
+
+            log.warn('message');
+            assert.strictEqual(log.count.error, 0);
+            assert.strictEqual(log.count.info, 0);
+            assert.strictEqual(log.count.warn, 2);
+        });
+
+        test('Reset counters', function() {
+            log.warn('message');
+            log.warn('message');
+            log.warn('message');
+            
+            log.resetCount();
+
+            assert.strictEqual(log.count.error, 0);
+            assert.strictEqual(log.count.info, 0);
+            assert.strictEqual(log.count.warn, 0);
+        });
+
     });
 });
