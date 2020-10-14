@@ -1,48 +1,51 @@
 'use strict';
 
+import { Logger } from './log';
+
 export type Compares = 'folders' | 'images' | 'text';
 type TypeOf = 'bigint' | 'boolean' | 'function' | 'number' | 'object' | 'string' | 'symbol' | 'undefined';
 type Unknown<T> = { [P in keyof T]?: unknown };
 
 export interface Defaults {
-    folders: string | null,
-    images: string | null,
-    text: string | null,
+    folders: string | null;
+    images: string | null;
+    text: string | null;
 }
 
 export interface DefaultsConfiguration {
-    folders?: string
-    images?: string,
-    text?: string,
+    folders?: string;
+    images?: string;
+    text?: string;
 }
 
 export interface ExternalTool {
-    name: string,
-    path: string,
-    args: string[],
-    compares: Set<Compares>
+    name: string;
+    path: string;
+    args: string[];
+    compares: Set<Compares>;
 }
 
 export interface ExternalToolConfiguration {
-    name: string,
-    path: string,
-    args?: string[],
-    compares?: Compares[]
+    name: string;
+    path: string;
+    args?: string[];
+    compares?: Compares[];
 }
 
 export interface Configuration {
-    defaults: Defaults,
-    tools: ExternalTool[]
+    defaults: Defaults;
+    tools: ExternalTool[];
 }
 
 export interface VscodeConfiguration {
-    defaults: Unknown<DefaultsConfiguration>,
-    tools: Unknown<ExternalToolConfiguration>[]
+    defaults: Unknown<DefaultsConfiguration>;
+    tools: Unknown<ExternalToolConfiguration>[];
 }
 
 const defaultTools: Defaults = { folders: null, images: null, text: null };
 const toolsByName: Map<string, ExternalTool> = new Map();
 const toolsByCompares: Map<Compares, Set<ExternalTool>> = new Map();
+let log: Logger | undefined;
 
 function resetDefaultTools(): void {
     defaultTools.folders = null;
@@ -141,8 +144,8 @@ function processDefaultsConfiguration(data: unknown): Defaults {
     if (defaults = asDefaults(data)) {
         return defaults;
     } else {
-        // #TODO: Output to channel
-        console.log(`processDefaultsConfiguration: Invalid configuration, skipping... ${JSON.stringify(data)}`);
+        log?.error('processDefaultsConfiguration: Invalid configuration, skipping...');
+        log?.append(data, '  |  ');
     }
 
     return { folders: null, images: null, text: null };
@@ -174,8 +177,8 @@ function processExternalToolConfiguration(data: unknown): ExternalTool[] {
             if (tool = asExternalTool(element)) {
                 tools.push(tool);
             } else {
-                // #TODO: Output to channel
-                console.log(`processExternalToolConfiguration: Invalid configuration, skipping... ${JSON.stringify(element)}`);
+                log?.error('processExternalToolConfiguration: Invalid configuration, skipping...');
+                log?.append(element, '  |  ');
             }
         });
     }
@@ -204,12 +207,12 @@ function indexTools(tools: ExternalTool[], defaults?: Defaults): void {
                     toolsByCompares.get(by)?.add(tool);
                 });
             } else {
-                // #TODO: Output to channel
-                console.log(`indexTools: Duplicate tool name "${name}", skipping... ${JSON.stringify(tool)}`);
+                log?.warn(`indexTools: Duplicate tool name "${name}", skipping...`);
+                log?.append(tool, '  |  ');
             }
         } else {
-            // #TODO: Output to channel
-            console.log(`indexTools: Tool validation failure, skipping... ${JSON.stringify(tool)}`);
+            log?.warn('indexTools: Tool validation failure, skipping...');
+            log?.append(tool, '  |  ');
         }
     });
 
@@ -223,8 +226,7 @@ function indexTools(tools: ExternalTool[], defaults?: Defaults): void {
                 if (toolsByName.has(name.toLowerCase())) {
                     defaultTools[by] = name;
                 } else {
-                    // #TODO: Output to channel
-                    console.log(`indexTools: Unknown tool "${name}", skipping default for "${by}"`);
+                    log?.warn(`indexTools: Unknown tool "${name}", skipping setting default for "${by}"`);
                 }
             }
         });
@@ -269,4 +271,8 @@ export function getTools(compares?: Compares): ExternalTool[] {
     }
 
     return tools;
+}
+
+export function setLogger(logger: Logger | undefined): void {
+    log = logger;
 }
