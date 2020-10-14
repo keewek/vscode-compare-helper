@@ -4,6 +4,13 @@ import { beforeEach, test } from 'mocha';
 import { OutputChannel } from 'vscode';
 import * as Log from '../../log';
 
+interface Test {
+    name: string;
+    actual: any;
+	expected: any;
+    msg?: string;
+}
+
 class Channel {
     value: string = '';
 
@@ -26,46 +33,52 @@ suite('Log Test Suite', function () {
             log = new Log.ChannelLogger(channel as unknown as OutputChannel);
         });
     
-        test('Append object', function() {
-            const expected = "[\n  {\n    \"char\": \"A\",\n    \"num\": 1\n  },\n  {\n    \"char\": \"B\",\n    \"num\": 2\n  }\n]";
-            let data = [
-                { char: 'A', num: 1},
-                { char: 'B', num: 2},
+        suite('Append', function() {
+            let tests: Test[] = [
+                {name: 'bigint', actual: BigInt(2), expected: '2'},
+                {name: 'boolean', actual: true, expected: 'true'},
+                {name: 'function', actual: (value: any) => value, expected: '(value) => value'},
+                {name: 'number', actual: 1, expected: '1'},
+                {name: 'string', actual: '1', expected: '1'},
+                {name: 'undefined', actual: undefined, expected: 'undefined'},
+                {name: 'symbol', actual: Symbol('Test'), expected: 'Symbol(Test)'},
+                {name: 'null', actual: null, expected: 'null'},
+                {name: 'object', actual: [
+                    { char: 'A', num: 1},
+                    { char: 'B', num: 2},
+                ], expected: "[\n  {\n    \"char\": \"A\",\n    \"num\": 1\n  },\n  {\n    \"char\": \"B\",\n    \"num\": 2\n  }\n]"},
             ];
 
-            log.append(data);
-
-            assert.strictEqual(channel.value, expected);
+            tests.forEach(function (testItem) {
+                test(`${testItem.name}`, function () {
+                    log.append(testItem.actual);
+                    assert.strictEqual(channel.value, testItem.expected);
+                });
+            });
         });
 
-        test('Append string', function() {
-            const expected = "Test";
-            let data = 'Test';
-
-            log.append(data);
-
-            assert.strictEqual(channel.value, expected);
-        });
-
-        test('Append object with prefix', function() {
-            const expected = "  |  [\n  |    {\n  |      \"char\": \"A\",\n  |      \"num\": 1\n  |    },\n  |    {\n  |      \"char\": \"B\",\n  |      \"num\": 2\n  |    }\n  |  ]";
-            let data = [
-                { char: 'A', num: 1},
-                { char: 'B', num: 2},
+        suite('Append with prefix', function() {
+            let tests: Test[] = [
+                {name: 'bigint', actual: BigInt(2), expected: '  |  2'},
+                {name: 'boolean', actual: true, expected: '  |  true'},
+                {name: 'function', actual: (value: any) => value, expected: '  |  (value) => value'},
+                {name: 'number', actual: 1, expected: '  |  1'},
+                {name: 'string', actual: '1', expected: '  |  1'},
+                {name: 'undefined', actual: undefined, expected: '  |  undefined'},
+                {name: 'symbol', actual: Symbol('Test'), expected: '  |  Symbol(Test)'},
+                {name: 'null', actual: null, expected: '  |  null'},
+                {name: 'object', actual: [
+                    { char: 'A', num: 1},
+                    { char: 'B', num: 2},
+                ], expected: "  |  [\n  |    {\n  |      \"char\": \"A\",\n  |      \"num\": 1\n  |    },\n  |    {\n  |      \"char\": \"B\",\n  |      \"num\": 2\n  |    }\n  |  ]"},
             ];
 
-            log.append(data, '  |  ');
-
-            assert.strictEqual(channel.value, expected);
-        });
-
-        test('Append string with prefix', function() {
-            const expected = "  |  Test";
-            let data = 'Test';
-
-            log.append(data, '  |  ');
-
-            assert.strictEqual(channel.value, expected);
+            tests.forEach(function (testItem) {
+                test(`${testItem.name}`, function () {
+                    log.append(testItem.actual, '  |  ');
+                    assert.strictEqual(channel.value, testItem.expected);
+                });
+            });
         });
 
         test('Error', function() {

@@ -11,7 +11,7 @@ export interface Count {
 export interface Logger {
     count: Count;
     resetCount(): void;
-    append(value: string | object, prefix?: string): void;
+    append(value: any, prefix?: string): void;
     error(msg: string): void;
     info(msg: string): void;
     warn(msg: string): void;
@@ -45,17 +45,38 @@ export class ChannelLogger implements Logger {
         this.warnCount  = 0;
     }
 
-    append(value: string | object, prefix: string = ''): void {
+    append(value: any, prefix: string = ''): void {
         let result: string;
 
-        if (typeof value === 'object') {
-            result = JSON.stringify(value, undefined, 2).split('\n').map(line => {
-                return `${prefix}${line}`;
-            }).join('\n');
-        } else {
-            result = `${prefix}${value}`;
-        }
+        switch (typeof value) {
+            case 'bigint':
+            case 'boolean':
+            case 'function':
+            case 'number':
+            case 'string':
+            case 'undefined':
+                result = `${prefix}${value}`;
+                break;
+            
+            case 'symbol':
+                result = `${prefix}${value.toString()}`;
+                break;
 
+            case 'object':
+                if (value === null) {
+                    result = `${prefix}${value}`;
+                } else {
+                    result = JSON.stringify(value, undefined, 2).split('\n').map(line => {
+                        return `${prefix}${line}`;
+                    }).join('\n');
+                }
+                break;
+
+            default:
+                throw new TypeError(`Unsupported type: "${typeof value}"`);
+                break;
+        }
+        
         this.channel?.append(result);
     }
 
