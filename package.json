@@ -10,22 +10,55 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:compare-helper.helloWorld"
+		"*",
+		"onCommand:compare-helper.compareFromExplorer",
+		"onCommand:compare-helper.compareFromExplorerUseDefaultTool",
+		"onCommand:compare-helper.dumpConfiguration"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "compare-helper.helloWorld",
-				"title": "Hello World"
+				"command": "compare-helper.compareFromExplorer",
+				"title": "Compare (Externally)..."
+			},
+			{
+				"command": "compare-helper.compareFromExplorerUseDefaultTool",
+				"title": "Compare (Externally)"
+			},
+			{
+				"command": "compare-helper.dumpConfiguration",
+				"title": "Dump Configuration to Output"
 			}
 		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "compare-helper.compareFromExplorer",
+					"when": "false"
+				},
+				{
+					"command": "compare-helper.compareFromExplorerUseDefaultTool",
+					"when": "false"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "compare-helper.compareFromExplorerUseDefaultTool",
+					"alt": "compare-helper.compareFromExplorer",
+					"group": "3_compare@9999",
+					"when": "listMultiSelection && !explorerResourceIsRoot && sideBarFocus && activeViewlet == 'workbench.view.explorer'"
+				}
+			]
+		},
 		"configuration": {
 			"type": "object",
 			"title": "Compare Helper",
 			"properties": {
 				"compareHelper.defaultExternalTools": {
 					"type": "object",
+					"markdownDescription": "Use value of the `name` property. See `#compareHelper.externalTools#`",
+					"scope": "application",
 					"properties": {
 						"folders": {
 							"type": "string"
@@ -42,12 +75,12 @@
 						"images": "",
 						"text": ""
 					},
-					"additionalProperties": false,
-					"markdownDescription": "Use value of the `name` property. See `#compareHelper.externalTools#`"
+					"additionalProperties": false
 				},
 				"compareHelper.externalTools": {
 					"type":"array",
 					"description": "A list of available external tools and their configurations",
+					"scope": "application",
 					"items": {
 						"type": "object",
 						"properties": {
