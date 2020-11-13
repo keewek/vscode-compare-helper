@@ -4,13 +4,12 @@
 	"description": "",
 	"version": "0.0.1",
 	"engines": {
-		"vscode": "^1.49.0"
+		"vscode": "^1.50.0"
 	},
 	"categories": [
 		"Other"
 	],
 	"activationEvents": [
-		"*",
 		"onCommand:compare-helper.compareFromExplorer",
 		"onCommand:compare-helper.compareFromExplorerUseDefaultTool",
 		"onCommand:compare-helper.dumpConfiguration"
@@ -20,15 +19,20 @@
 		"commands": [
 			{
 				"command": "compare-helper.compareFromExplorer",
-				"title": "Compare (Externally)..."
+				"title": "Compare With...",
+				"category": "Compare Helper",
+				"enablement": "listMultiSelection && !explorerResourceIsRoot && sideBarFocus && activeViewlet == 'workbench.view.explorer'"
 			},
 			{
 				"command": "compare-helper.compareFromExplorerUseDefaultTool",
-				"title": "Compare (Externally)"
+				"title": "Compare",
+				"category": "Compare Helper",
+				"enablement": "listMultiSelection && !explorerResourceIsRoot && sideBarFocus && activeViewlet == 'workbench.view.explorer'"
 			},
 			{
 				"command": "compare-helper.dumpConfiguration",
-				"title": "Dump Configuration to Output"
+				"title": "Dump Configuration to Output",
+				"category": "Compare Helper"
 			}
 		],
 		"menus": {
@@ -44,20 +48,32 @@
 			],
 			"explorer/context": [
 				{
-					"command": "compare-helper.compareFromExplorerUseDefaultTool",
-					"alt": "compare-helper.compareFromExplorer",
-					"group": "3_compare@9999",
-					"when": "listMultiSelection && !explorerResourceIsRoot && sideBarFocus && activeViewlet == 'workbench.view.explorer'"
+					"submenu": "compare-helper.compare-helper",
+					"group": "3_compare@9999"
+				}
+			],
+			"compare-helper.compare-helper": [
+				{
+					"command": "compare-helper.compareFromExplorerUseDefaultTool"
+				},
+				{
+					"command": "compare-helper.compareFromExplorer"
 				}
 			]
 		},
+		"submenus": [
+			{
+				"id": "compare-helper.compare-helper",
+				"label": "Compare (External)"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "Compare Helper",
 			"properties": {
 				"compareHelper.defaultExternalTools": {
 					"type": "object",
-					"markdownDescription": "Use value of the `name` property. See `#compareHelper.externalTools#`",
+					"markdownDescription": "Use the value of the tool's `name` property. See `#compareHelper.externalTools#`",
 					"scope": "application",
 					"properties": {
 						"folders": {
@@ -78,17 +94,23 @@
 					"additionalProperties": false
 				},
 				"compareHelper.externalTools": {
-					"type":"array",
+					"type": "array",
 					"description": "A list of available external tools and their configurations",
 					"scope": "application",
 					"items": {
 						"type": "object",
 						"properties": {
-							"name": { "type": "string" },
-							"path": { "type": "string" },
-							"args": { 
+							"name": {
+								"type": "string"
+							},
+							"path": {
+								"type": "string"
+							},
+							"args": {
 								"type": "array",
-								"items": { "type": "string" }
+								"items": {
+									"type": "string"
+								}
 							},
 							"compares": {
 								"type": "array",
@@ -96,11 +118,18 @@
 								"maxItems": 3,
 								"items": {
 									"type": "string",
-									"enum": ["folders", "images", "text"]
+									"enum": [
+										"folders",
+										"images",
+										"text"
+									]
 								}
 							}
 						},
-						"required": ["name", "path", "args", "compares"],
+						"required": [
+							"name",
+							"path"
+						],
 						"additionalProperties": false
 					}
 				}
@@ -116,16 +145,17 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.49.0",
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^8.0.0",
-		"@types/node": "^14.0.27",
-		"eslint": "^7.6.0",
+		"@types/node": "^14.14.3",
+		"@types/vscode": "^1.50.0",
 		"@typescript-eslint/eslint-plugin": "^3.8.0",
 		"@typescript-eslint/parser": "^3.8.0",
+		"eslint": "^7.12.0",
 		"glob": "^7.1.6",
-		"mocha": "^8.1.3",
-		"typescript": "^4.0.2",
+		"mocha": "^8.2.0",
+		"nyc": "^15.1.0",
+		"typescript": "^4.0.3",
 		"vscode-test": "^1.4.0"
 	}
 }
