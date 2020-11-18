@@ -1,0 +1,52 @@
+// Example Windows configuration
+
+{
+    "compareHelper.defaultExternalTools": {
+        "folders": "FreeFileSync",
+        "images": "p4merge",
+        "text": "p4merge"
+    },
+    "compareHelper.externalTools": [
+        {
+            "name": "p4merge",
+            "path": "C:\\Program Files\\Perforce\\p4merge.exe",
+            "args": [
+                "${FOLDER_ITEM_1}", // base / left
+                "${FOLDER_ITEM_2}", // left / right
+                "${FOLDER_ITEM_3}", // right
+                "${FOLDER_ITEM_4}"  // merge
+            ],
+            "compares": ["images", "text"]
+        },
+        {
+            "name": "Meld",
+            "path": "C:\\Program Files (x86)\\Meld\\Meld.exe",
+            "args": [
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}",
+                "${FOLDER_ITEM_3}"
+            ],
+            "compares": ["folders", "text"]
+        },
+        {
+            "name": "KDiff3",
+            "path": "C:\\Program Files\\kdiff3\\bin\\kdiff3.exe",
+            "args": [
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}",
+                "${FOLDER_ITEM_3}"
+            ],
+            "compares": ["folders", "text"]
+        },
+        {
+            "name": "FreeFileSync",
+            "path": "C:\\Program Files\\FreeFileSync\\FreeFileSync.exe",
+            "args": [
+                "-DirPair",
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}"
+            ],
+            "compares": ["folders"]
+        }
+    ]
+}

@@ -1,0 +1,62 @@
+// Example OS X configuration
+
+{
+    "compareHelper.defaultExternalTools": {
+        "folders": "FreeFileSync",
+        "images": "p4merge",
+        "text": "opendiff"
+    },
+    "compareHelper.externalTools": [
+        {
+            "name": "FreeFileSync",
+            "path": "/Applications/FreeFileSync/FreeFileSync.app/Contents/MacOS/FreeFileSync",
+            "args": [
+                "-DirPair",
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}"
+            ],
+            "compares": [
+                "folders"
+            ]
+        },
+        {
+            "name": "opendiff",
+            "path": "opendiff",
+            "args": [
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}"
+            ],
+            "compares": [
+                "text",
+                "folders"
+            ]
+        },
+        {
+            "name": "bbdiff",
+            "path": "bbdiff",
+            "args": [
+                "--text-files-only",
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}"
+            ],
+            "compares": [
+                "text",
+                "folders"
+            ]
+        },
+        {
+            "name": "p4merge",
+            "path": "/Applications/p4merge.app/Contents/MacOS/p4merge",
+            "args": [
+                "${FOLDER_ITEM_1}", // base / left
+                "${FOLDER_ITEM_2}", // left / right
+                "${FOLDER_ITEM_3}", // right
+                "${FOLDER_ITEM_4}"  // merge
+            ],
+            "compares": [
+                "text",
+                "images"
+            ]
+        }
+    ]
+}
