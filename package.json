@@ -1,14 +1,39 @@
 {
 	"name": "compare-helper",
 	"displayName": "Compare Helper",
-	"description": "",
-	"version": "0.0.1",
+	"description": "Compare files or folders via configured external tools",
+	"version": "1.0.0",
+	"publisher": "keewek",
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Alexander Bugrov"
+	},
 	"engines": {
 		"vscode": "^1.50.0"
 	},
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"compare",
+		"diff",
+		"merge",
+		"external",
+		"tool"
+	],
+	"bugs": {
+		"url": "https://github.com/keewek/vscode-compare-helper/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/keewek/vscode-compare-helper.git"
+	},
+	"icon": "assets/icon_256.png",
+	"galleryBanner": {
+		"color": "#F5F5F5",
+		"theme": "light"
+	},
+	"homepage": "https://github.com/keewek/vscode-compare-helper",
 	"activationEvents": [
 		"onCommand:compare-helper.compareFromExplorer",
 		"onCommand:compare-helper.compareFromExplorerUseDefaultTool",
