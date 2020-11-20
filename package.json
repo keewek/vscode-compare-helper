@@ -34,6 +34,9 @@
 		"theme": "light"
 	},
 	"homepage": "https://github.com/keewek/vscode-compare-helper",
+	"extensionKind": [
+		"ui"
+	],
 	"activationEvents": [
 		"onCommand:compare-helper.compareFromExplorer",
 		"onCommand:compare-helper.compareFromExplorerUseDefaultTool",
