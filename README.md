@@ -1,65 +1,187 @@
-# compare-helper README
+# Compare Helper
 
-This is the README for your extension "compare-helper". After writing up a brief description, we recommend including the following sections.
+Compare files or folders via configured external tools.
+
+![](assets/docs/727_compare.gif)
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Extension adds a new submenu `Compare (External)`
 
-For example if there is an image subfolder under your extension project workspace:
+![](assets/docs/727_menu.png)
 
-\!\[feature X\]\(images/feature-x.png\)
+- `Compare`
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+    Compares selected items with the configured default tool.
+
+- `Compare With...`
+
+    Shows a tool selection GUI and compares selected items with the chosen tool. Tools are filtered by item's kind.
+
+    ![](assets/docs/gui_compare_with.png)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Extension is fully dependent upon installed external tools. Configure them as needed in the Extension's Settings.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+- `compareHelper.defaultExternalTools`: default tools to use 
+
+    For example:
+
+    ```json
+    "compareHelper.defaultExternalTools": {
+        "folders": "FreeFileSync",
+        "images": "p4merge",
+        "text": "bbdiff"
+    }
+    ```
+    | Property | Type     | Optional | Default | Description
+    | -------- | -------- | :------: | :-----: | ------------
+    | folders  | string   |    ✔     |   ''    | Default tool for folders
+    | images   | string   |    ✔     |   ''    | Default tool for images
+    | text     | string   |    ✔     |   ''    | Default tool for text
+
+    > Use the value of the tool's `name` property.
+
+- `compareHelper.externalTools`: external tools configuration
+
+    For example:
+
+    ```jsonc
+    "compareHelper.externalTools": [
+        {
+            "name": "bbdiff",
+            "path": "bbdiff",
+            "args": [
+                "--text-files-only",
+                "${FOLDER_ITEM_1}",
+                "${FOLDER_ITEM_2}"
+            ],
+            "compares": [
+                "text",
+                "folders"
+            ]
+        },
+        {
+            "name": "p4merge",
+            "path": "/Applications/p4merge.app/Contents/MacOS/p4merge",
+            "args": [
+                "${FOLDER_ITEM_1}", // base / left
+                "${FOLDER_ITEM_2}", // left / right
+                "${FOLDER_ITEM_3}", // right
+                "${FOLDER_ITEM_4}"  // merge
+            ],
+            "compares": [
+                "text",
+                "images"
+            ]
+        }
+    ]
+    ```
+
+    | Property | Type                 | Optional | Default                       | Description 
+    | -------- | ---------------------| :------: | :---------------------------: | ------------ 
+    | name     | string               |          |                               | Used in GUI and as ID for default settings. Must be a unique value
+    | path     | string               |          |                               | Absolute or relative path to the executable
+    | args     | (string \| args)[]   |    ✔     |           *SPECIAL*           | See [Args](#Args) bellow
+    | compares | string[]             |    ✔     | ['folders', 'images', 'text'] | Specifies what kind of items a tool can handle. Allowed values: "folders", "images", "text"
+    
+    > ### Args
+    > 
+    > When args array is empty or missing all selected items are used as args, one item per argument.
+    >
+    > The following template `${FOLDER_ITEM_n}` where n ≥ 1 can be used to refer to the selected item. Items are in click order.
+    >
+    > An **entire arg** is ignored when template refers to an item out of range.
+    >
+    > For example:
+    >
+    > ```jsonc
+    > [
+    >     "${FOLDER_ITEM_1}", // base / left
+    >     "${FOLDER_ITEM_2}", // left / right
+    >     "${FOLDER_ITEM_3}", // right
+    >     "${FOLDER_ITEM_4}"  // merge
+    > ]
+    > ```
+    > 
+    > With only two selected items args will be `["path/to/item/1", "path/to/item/2"]`
+    > 
+    > ### Nested Args
+    >
+    > Arguments could be nested. An **entire nested arg and all its children** is ignored when template refers to an item out of range.
+    >
+    > For example:
+    >
+    > ```jsonc
+    > [
+    >     "${FOLDER_ITEM_1}",     // base / left
+    >     "${FOLDER_ITEM_2}",     // left / right
+    >     "${FOLDER_ITEM_3}",     // right
+    >     [
+    >         "--out",
+    >         "${FOLDER_ITEM_4}", // Output file
+    >         [
+    >             "-L", "Label for Base",
+    >             "-L", "Label for Left",
+    >             "-L", "Label for Right",
+    >         ]
+    >     ]
+    > ]
+    > ```
+    >
+    > With only two selected items args will be `["path/to/item/1", "path/to/item/2"]`
+    >
+    > With four selected items args will be flatten to:
+    > 
+    > ```json
+    > [
+    >     "path/to/item/1",
+    >     "path/to/item/2",
+    >     "path/to/item/3",
+    >     "--out",
+    >     "path/to/item/4", 
+    >     "-L", 
+    >     "Label for Base",
+    >     "-L",
+    >     "Label for Left",
+    >     "-L",
+    >     "Label for Right",
+    > ]
+    > ```
+
+
+### Example configurations:
+
+- [Windows](docs/config.win.jsonc)
+- [OS X](docs/config.osx.jsonc)
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- Keybindings
 
-## Release Notes
+    Triggering `Compare`, `Compare With...` commands via keybindings doesn't work.
 
-Users appreciate release notes as you update your extension.
+    Due to API limitation, current selection in `Explorer` view is passed to command only if such command is triggered via context menu.
+
+- Remote Development
+
+    Current version doesn't support Remote Development mode.
+
+## Latest Version
 
 ### 1.0.0
 
-Initial release of ...
+Initial release
 
-### 1.0.1
+See [CHANGELOG.md](CHANGELOG.md) for complete release notes.
 
-Fixed issue #.
+## Acknowledgements
 
-### 1.1.0
+- Fonts by [Font Awesome Free](https://github.com/FortAwesome/Font-Awesome)
 
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+<!-- ### -->
