@@ -168,7 +168,8 @@
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js",
-		"vsce:publish": "vsce publish --githubBranch main --message 'release: %s'"
+		"vsce:publish": "vsce publish --githubBranch main --message 'release: %s'",
+		"vsce:package": "vsce package --githubBranch main"
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
