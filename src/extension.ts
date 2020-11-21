@@ -85,6 +85,11 @@ async function onCommandCompareFromExplorer(items: any, log: ChannelLogger, isUs
         let selectedTool: config.ExternalTool | undefined;
         const task = await prepareCompareTask(items);
         
+        if (task.isRemote) {
+            window.showWarningMessage("Current version doesn't support Remote Development mode");
+            return false;
+        }
+
         if (task.tools.length === 0) {
             window.showWarningMessage(`No configured tools found for ${task.compares} comparison.\n\nCheck configuration...`);
             return false;
@@ -103,7 +108,7 @@ async function onCommandCompareFromExplorer(items: any, log: ChannelLogger, isUs
             }
         }
 
-        const cmd = await prepareCompareCommand(selectedTool, task);
+        const cmd = prepareCompareCommand(selectedTool, task);
         await executeCompareCommand(cmd);
 
         return true;
