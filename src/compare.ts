@@ -24,6 +24,7 @@ export interface CompareTask {
     compares: Compares;
     items: CompareItem[];
     tools: ExternalTool[];
+    isRemote: boolean;
     defaultTool?: ExternalTool;
 }
 
@@ -96,17 +97,24 @@ export async function prepareCompareTask(items: unknown): Promise<CompareTask> {
     // Normalize input
     const compareItems = await asCompareItems(items);
     
+    // Determine what mode we are in
+    const isRemote = hasRemoteItems(compareItems);
+
     // Determine what we are comparing
     const compares = determineCompares(compareItems);
 
     // Filter compatible tools
     const tools = getTools(compares);
 
+    // Get default tool
+    const defaultTool = getDefaultTool(compares);
+
     return {
         compares: compares,
         items: compareItems,
         tools: tools,
-        defaultTool: getDefaultTool(compares)
+        isRemote: isRemote,
+        defaultTool: defaultTool
     };
 }
 
@@ -166,6 +174,16 @@ function processArgs(args: ExternalToolArgs, items: CompareItem[], depth = 0): s
         return result;
 }
 
+function hasRemoteItems(items: CompareItem[]): boolean {
+    for (const item of items) {
+        if (item.uri.scheme === 'vscode-remote') {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function determineCompares(items: CompareItem[]): Compares {
     let kind: CompareItemKind;
     let compares: Compares;
@@ -211,7 +229,7 @@ async function asCompareItems(items: unknown): Promise<CompareItem[]> {
         for (const item of items) {
             if (isVscodeExplorerItem(item)) {
                 if (item.fsPath.length > 0) {
-                    const uri = Uri.file(item.fsPath);
+                    const uri = item instanceof Uri ? item : Uri.file(item.fsPath);
                     const stat = await workspace.fs.stat(uri);
 
                     result.push({

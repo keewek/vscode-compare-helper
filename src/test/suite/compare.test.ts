@@ -1,11 +1,51 @@
 import * as assert from 'assert';
-import { Uri } from 'vscode';
+import { Uri, workspace, FileSystemProvider, Disposable, Event, FileChangeEvent, FileStat, FileType, EventEmitter } from 'vscode';
 import { ChildProcess } from 'child_process';
 
 import * as config from '../../config'; 
 import * as Compare from '../../compare';
 import { NullLogger, Counter } from '../../log';
 import * as Path from 'path';
+
+class FakeVscodeRemoteFileSystemProvider implements FileSystemProvider {
+    private _emitter = new EventEmitter<FileChangeEvent[]>();
+
+    readonly onDidChangeFile: Event<FileChangeEvent[]> = this._emitter.event;
+    
+    watch(_uri: Uri, _options: { recursive: boolean; excludes: string[]; }): Disposable {
+        return new Disposable(() => { });
+    }
+
+    stat(uri: Uri): FileStat | Thenable<FileStat> {
+        let newUri = uri.scheme === 'vscode-remote' ? uri.with({ scheme: 'file' }) : uri;
+
+        return workspace.fs.stat(newUri);
+    }
+
+    readDirectory(_uri: Uri): [string, FileType][] | Thenable<[string, FileType][]> {
+        return [];
+    }
+
+    createDirectory(_uri: Uri): void | Thenable<void> {
+        // Null
+    }
+
+    readFile(_uri: Uri): Uint8Array | Thenable<Uint8Array> {
+        return new Uint8Array();
+    }
+
+    writeFile(_uri: Uri, _content: Uint8Array, _options: { create: boolean; overwrite: boolean; }): void | Thenable<void> {
+        // Null
+    }
+
+    delete(_uri: Uri, _options: { recursive: boolean; }): void | Thenable<void> {
+        // Null
+    }
+
+    rename(_oldUri: Uri, _newUri: Uri, _options: { overwrite: boolean; }): void | Thenable<void> {
+        // Null
+    } 
+}
 
 // const rootUri  = workspace.workspaceFolders?.[0].uri;
 const rootUri = Uri.file(Path.resolve(__dirname, '../../../src/test/workspace'));
@@ -71,6 +111,17 @@ suite('Compare Test Suite', function () {
     });
 
     suite('prepareCompareTask', function() {
+        let provider: FakeVscodeRemoteFileSystemProvider;
+        let providerDisposable: Disposable;
+
+        suiteSetup(function() {
+            provider = new FakeVscodeRemoteFileSystemProvider();
+            providerDisposable = workspace.registerFileSystemProvider('vscode-remote', provider);
+        });
+
+        suiteTeardown(function() {
+            providerDisposable.dispose();
+        });
 
         test('with text items', async function() {
             if (!rootUri) { this.skip(); }
@@ -204,6 +255,35 @@ suite('Compare Test Suite', function () {
             }, {
                 name: 'EntryNotFound (FileSystemError)'
             });
+        });
+
+        test('items could be an instances of Uri', async function() {
+            const task = await Compare.prepareCompareTask([
+                Uri.file(workspacePath(rootUri, 'foo.txt')),
+                Uri.file(workspacePath(rootUri, 'bar.txt'))
+            ]);
+
+            assert.strictEqual(task.items.length, 2);
+            assert.strictEqual(task.items[0].kind, 'file');
+            assert.strictEqual(task.items[1].kind, 'file');
+        });
+
+        test('isRemote property is false with local items', async function() {
+            const task = await Compare.prepareCompareTask([
+                Uri.file(workspacePath(rootUri, 'foo.txt')),
+                Uri.file(workspacePath(rootUri, 'bar.txt'))
+            ]);
+
+            assert.strictEqual(task.isRemote, false);
+        });
+
+        test('isRemote property is true with items that have "vscode-remote" scheme', async function() {
+            const task = await Compare.prepareCompareTask([
+                Uri.file(workspacePath(rootUri, 'foo.txt')),
+                Uri.file(workspacePath(rootUri, 'bar.txt')).with({ scheme: 'vscode-remote' })
+            ]);
+
+            assert.strictEqual(task.isRemote, true);
         });
     });
 
