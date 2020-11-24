@@ -11,12 +11,18 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}/src/test/workspace"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/**/*.js"
 			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"preLaunchTask": "${defaultBuildTask}",
+			"env": {
+				"COVERAGE": "0",
+				"SELECT_SUITE": "0",
+				"CUR_OPENED_FILE": ""
+			}
 		},
 		{
 			"name": "Extension Tests",
@@ -24,13 +30,65 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+				"${workspaceFolder}/src/test/workspace"
 			],
 			"outFiles": [
 				"${workspaceFolder}/out/test/**/*.js"
 			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"preLaunchTask": "${defaultBuildTask}",
+			"env": {
+				"COVERAGE": "0",
+				"SELECT_SUITE": "0",
+				"CUR_OPENED_FILE": ""
+			}
+		},
+		{
+			"name": "Extension Tests (Select)",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--disable-extensions",
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+				"${workspaceFolder}/src/test/workspace"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/**/*.js"
+			],
+			"preLaunchTask": "${defaultBuildTask}",
+			"env": {
+				"COVERAGE": "0",
+				"SELECT_SUITE": "1",
+				"CUR_OPENED_FILE": "${fileBasenameNoExtension}"
+			}
+		},
+// !!!
+// !!! Coverage won't work while "activationEvents" contains "*" inside package.json
+// !!!
+		{
+			"name": "Extension Tests (Coverage)",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--disable-extensions",
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+				"${workspaceFolder}/src/test/workspace"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/**/*.js"
+			],
+			"preLaunchTask": "npm: pretest",
+			"env": {
+				"COVERAGE": "1",
+				"SELECT_SUITE": "1",
+				"CUR_OPENED_FILE": "${fileBasenameNoExtension}"
+			}
 		}
 	]
 }
