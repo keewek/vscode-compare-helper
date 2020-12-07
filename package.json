@@ -187,5 +187,8 @@
 		"nyc": "^15.1.0",
 		"typescript": "^4.0.3",
 		"vscode-test": "^1.4.0"
+	},
+	"dependencies": {
+		"pure-uuid": "^1.6.1"
 	}
 }
