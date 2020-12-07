@@ -58,7 +58,7 @@ export function executeCompareCommand(cmd: CompareCommand): Promise<ChildProcess
             resolve(cp);
         }
 
-        cp.on('error', error => {
+        cp.once('error', error => {
             const errorWithData = new ErrorWithData('Encountered error while running comparison tool', {
                 scope: 'compare.executeCompareCommand',
                 data: {
@@ -68,6 +68,11 @@ export function executeCompareCommand(cmd: CompareCommand): Promise<ChildProcess
             });
             reject(errorWithData);
         });
+
+        cp.once('exit', () => {
+            cp.removeAllListeners();
+        });
+
     });
 }
 
