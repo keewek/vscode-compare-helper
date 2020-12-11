@@ -181,7 +181,7 @@ function processArgs(args: ExternalToolArgs, items: CompareItem[], depth = 0): s
 
 function hasRemoteItems(items: CompareItem[]): boolean {
     for (const item of items) {
-        if (item.uri.scheme === 'vscode-remote') {
+        if (item.uri.scheme !== 'file') {
             return true;
         }
     }
