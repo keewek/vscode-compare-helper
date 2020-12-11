@@ -178,7 +178,7 @@ function processErrorWithData(err: ErrorWithData, log: Logger): void {
     // if (err.hasData) { log.append(err.data, '  ↦  '); }
     // if (err.hasData) { log.append(err.data, '  ⤅  '); }
    
-    window.showErrorMessage(`${err.message}.\n\nSee output for details...`);
+    window.showErrorMessage(`${err.message}, see output for details...`);
     if (log instanceof ChannelLogger) {
         log.channel?.show(true);
     }
