@@ -4,8 +4,8 @@ All notable changes to the "Compare Helper" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-<!-- ## [1.1.0] - 2020-12-11 -->
+<!-- ## [Unreleased] -->
+## [1.1.0] - 2020-12-12
 ### Added
 
 - Remote Development support
@@ -22,9 +22,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
     Comparison is not possible.
 
-  ![](assets/docs/710_remote.gif)
+  ![](https://github.com/keewek/vscode-compare-helper/raw/main/assets/docs/710_remote.gif)
   
-  ![](assets/docs/remote_sync.png)
+  ![](https://github.com/keewek/vscode-compare-helper/raw/main/assets/docs/remote_sync.png)
 
 ## [1.0.0] - 2020-11-22
 
