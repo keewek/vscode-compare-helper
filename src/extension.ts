@@ -1,16 +1,19 @@
-import { commands, window, ExtensionContext, workspace, Disposable, FileSystemError } from 'vscode';
+import { commands, window, ExtensionContext, workspace, Disposable, FileSystemError, extensions } from 'vscode';
 import { prepareCompareTask, prepareCompareCommand, executeCompareCommand } from './compare';
 import { ErrorWithData } from "./exception";
 import { ChannelLogger, Logger, Counter } from './log';
 import * as Monitor from './monitor';
 import * as config from './config';
+import * as Inform from './inform';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: ExtensionContext) {
+    const ext = extensions.getExtension('keewek.compare-helper');
     const channel = window.createOutputChannel('Compare Helper');
     const configLog = new ChannelLogger(channel, new Counter());
     const generalLog = new ChannelLogger(channel);
+    const whatIsNew = new Inform.WhatIsNewInformer(context, ext, generalLog);
     
     config.setLogger(configLog);
     Monitor.setLogger(generalLog);
@@ -18,9 +21,10 @@ export function activate(context: ExtensionContext) {
     processConfiguration(configLog);
     
     context.subscriptions.push(generalLog, configLog, channel);
-    context.subscriptions.push(registerCommandCompareFromExplorer(generalLog));
-    context.subscriptions.push(registerCommandCompareFromExplorerUseDefaultTool(generalLog));
-    context.subscriptions.push(registerCommandDumpConfiguration(generalLog));
+    context.subscriptions.push(registerCommandCompareFromExplorer(generalLog, whatIsNew));
+    context.subscriptions.push(registerCommandCompareFromExplorerUseDefaultTool(generalLog, whatIsNew));
+    context.subscriptions.push(registerCommandDumpConfiguration(generalLog, whatIsNew));
+    context.subscriptions.push(registerCommandWhatIsNew(generalLog, whatIsNew));
     context.subscriptions.push(onDidChangeConfiguration(configLog));
 }
 
@@ -64,23 +68,41 @@ function processConfiguration(log: ChannelLogger): void {
     }
 }
 
-function registerCommandDumpConfiguration(log: ChannelLogger): Disposable {
+function registerCommandDumpConfiguration(log: ChannelLogger, whatIsNew: Inform.InformerInterface): Disposable {
     return commands.registerCommand('compare-helper.dumpConfiguration', () => {
         log.info('Dumping configuration...');
         log.append(config.getConfiguration(), '  -->  ');
         log.channel?.show(true);
+
+        if (whatIsNew.shouldInform) {
+            whatIsNew.inform();
+        }
     });
 }
 
-function registerCommandCompareFromExplorerUseDefaultTool(log: ChannelLogger): Disposable {
+function registerCommandWhatIsNew(_log: ChannelLogger, informer: Inform.InformerInterface): Disposable {
+    return commands.registerCommand('compare-helper.whatIsNew', () => {
+        informer.inform();
+    });
+}
+
+function registerCommandCompareFromExplorerUseDefaultTool(log: ChannelLogger, whatIsNew: Inform.InformerInterface): Disposable {
     return commands.registerCommand('compare-helper.compareFromExplorerUseDefaultTool', async (_activeItem, items) => {
         await onCommandCompareFromExplorer(items, log, true);
+        
+        if (whatIsNew.shouldInform) {
+            whatIsNew.inform();
+        }
     });
 }
 
-function registerCommandCompareFromExplorer(log: ChannelLogger): Disposable {
+function registerCommandCompareFromExplorer(log: ChannelLogger, whatIsNew: Inform.InformerInterface): Disposable {
     return commands.registerCommand('compare-helper.compareFromExplorer', async (_activeItem, items) => {
         await onCommandCompareFromExplorer(items, log, false);
+
+        if (whatIsNew.shouldInform) {
+            whatIsNew.inform();
+        }
     });
 }
 
