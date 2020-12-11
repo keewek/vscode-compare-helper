@@ -2,6 +2,7 @@ import { commands, window, ExtensionContext, workspace, Disposable, FileSystemEr
 import { prepareCompareTask, prepareCompareCommand, executeCompareCommand } from './compare';
 import { ErrorWithData } from "./exception";
 import { ChannelLogger, Logger, Counter } from './log';
+import * as Monitor from './monitor';
 import * as config from './config';
 
 // this method is called when your extension is activated
@@ -10,11 +11,12 @@ export function activate(context: ExtensionContext) {
     const channel = window.createOutputChannel('Compare Helper');
     const configLog = new ChannelLogger(channel, new Counter());
     const generalLog = new ChannelLogger(channel);
-
+    
     config.setLogger(configLog);
-
+    Monitor.setLogger(generalLog);
+    
     processConfiguration(configLog);
-
+    
     context.subscriptions.push(generalLog, configLog, channel);
     context.subscriptions.push(registerCommandCompareFromExplorer(generalLog));
     context.subscriptions.push(registerCommandCompareFromExplorerUseDefaultTool(generalLog));
@@ -23,9 +25,11 @@ export function activate(context: ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
+export function deactivate(): Promise<void> {
     config.setLogger(undefined);
-    return undefined;
+    Monitor.setLogger(undefined);
+    
+    return Monitor.dispose();
 }
 
 function onDidChangeConfiguration(log: ChannelLogger): Disposable {
@@ -85,8 +89,8 @@ async function onCommandCompareFromExplorer(items: any, log: ChannelLogger, isUs
         let selectedTool: config.ExternalTool | undefined;
         const task = await prepareCompareTask(items);
         
-        if (task.isRemote) {
-            window.showWarningMessage("Current version doesn't support Remote Development mode");
+        if (task.isRemote && task.compares === 'folders') {
+            window.showWarningMessage("Current version doesn't support remote folders.");
             return false;
         }
 
@@ -108,8 +112,19 @@ async function onCommandCompareFromExplorer(items: any, log: ChannelLogger, isUs
             }
         }
 
-        const cmd = prepareCompareCommand(selectedTool, task);
-        await executeCompareCommand(cmd);
+        if (task.isRemote) {
+            log.info('Preparing to process remote items...');
+
+            const session = Monitor.prepareSessionForTask(task);
+            if (await Monitor.initSessionAndShowProgress(session)) {
+                const cmd = prepareCompareCommand(selectedTool, session.items);
+                await Monitor.executeCompareCommandWithSession(cmd, session);
+            }
+
+        } else {
+            const cmd = prepareCompareCommand(selectedTool, task);
+            await executeCompareCommand(cmd);
+        }
 
         return true;
         
