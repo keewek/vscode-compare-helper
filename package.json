@@ -40,7 +40,8 @@
 	"activationEvents": [
 		"onCommand:compare-helper.compareFromExplorer",
 		"onCommand:compare-helper.compareFromExplorerUseDefaultTool",
-		"onCommand:compare-helper.dumpConfiguration"
+		"onCommand:compare-helper.dumpConfiguration",
+		"onCommand:compare-helper.whatIsNew"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -60,6 +61,11 @@
 			{
 				"command": "compare-helper.dumpConfiguration",
 				"title": "Dump Configuration to Output",
+				"category": "Compare Helper"
+			},
+			{
+				"command": "compare-helper.whatIsNew",
+				"title": "What is new in this version",
 				"category": "Compare Helper"
 			}
 		],
