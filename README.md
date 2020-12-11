@@ -20,6 +20,24 @@ Extension adds a new submenu `Compare (External)`
 
     ![](assets/docs/gui_compare_with.png)
 
+### Remote Development support
+  
+  - Remote `Text` files
+    
+    Comparison is possible, changes made by external tools are synced back with `editor`.
+
+  - Remote `Image` files
+
+    Comparison is possible, but changes are **ignored**. Further releases will feature an option to transfer changed images back to the original remote location.
+
+  - Remote `Folders`
+
+    Comparison is not possible.
+
+![](assets/docs/710_remote.gif)
+
+![](assets/docs/remote_sync.png)
+
 ## Requirements
 
 Extension is fully dependent upon installed external tools. Configure them as needed in the Extension's Settings.
@@ -170,13 +188,20 @@ This extension contributes the following settings:
 
 - Remote Development
 
-    Current version doesn't support Remote Development mode.
+    - Remote `Image` files
+
+        Comparison is possible, but changes are **ignored**. Further releases will feature an option to transfer changed images back to the original remote location.
+
+    - Remote `Folders`
+
+        Comparison is not possible.
 
 ## Latest Version
 
-### 1.0.0
+### 1.1.0
+#### Added
 
-Initial release
+- [Remote Development support](#Remote-Development-support)
 
 See [CHANGELOG.md](CHANGELOG.md) for complete release notes.
 
