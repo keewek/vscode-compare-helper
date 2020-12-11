@@ -3,7 +3,7 @@ import { Uri, workspace, FileType } from 'vscode';
 import { hasProperty } from './type';
 import { Compares, ExternalTool, getTools, getDefaultTool, ExternalToolArgs } from './config';
 import { ErrorWithData } from './exception';
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess, spawn, SpawnOptions } from 'child_process';
 
 export type CompareItemKind = 'folder' | 'file' | 'image';
 
@@ -45,12 +45,20 @@ const imageExtensions =  new Set(['3ds', 'apng', 'avci', 'avcs', 'avif', 'avifs'
 ]);
 /* cSpell:enable */
 
-export function executeCompareCommand(cmd: CompareCommand): Promise<ChildProcess> {
+export function executeCompareCommand(cmd: CompareCommand, opts?: SpawnOptions): Promise<ChildProcess> {
     return new Promise((resolve, reject) => {
-        const cp = spawn(cmd.tool.path, cmd.args, {
-            detached: true,
-            // stdio: 'ignore',
-        });
+        let spawnOptions: SpawnOptions;
+
+        if (typeof opts === 'undefined') {
+            spawnOptions = {
+                detached: true,
+                stdio: 'ignore',
+            };
+        } else {
+            spawnOptions = opts;
+        }
+
+        const cp = spawn(cmd.tool.path, cmd.args, spawnOptions);
 
         cp.unref();
 
