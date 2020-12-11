@@ -540,7 +540,7 @@ suite('Compare Test Suite', function () {
             this.slow(1000);
 
             try {
-                cp = await Compare.executeCompareCommand(cmd);
+                cp = await Compare.executeCompareCommand(cmd, { detached: true });
             } catch (e) {
                 return Promise.reject(e);
             }
@@ -562,7 +562,7 @@ suite('Compare Test Suite', function () {
         });
 
         test('throws on error', function() {
-            cmd.tool.path = 'qqq';
+            cmd.tool.path = 'abdb88f9-2590-44b6-9cc0-f6988ae574b5';
 
             assert.rejects(async () => {
                 await Compare.executeCompareCommand(cmd);
