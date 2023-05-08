@@ -34,12 +34,12 @@ export interface CompareCommand {
 }
 
 /* cSpell:disable */
-const imageExtensions =  new Set(['3ds', 'apng', 'avci', 'avcs', 'avif', 'avifs', 'azv', 'b16', 'bmp', 'btif', 'cgm', 
-    'cmx', 'dds', 'dib', 'djv', 'djvu', 'drle', 'dwg', 'dxf', 'emf', 'exr', 'fbs', 'fh', 'fh4', 'fh5', 'fh7', 'fhc', 
-    'fits', 'fpx', 'fst', 'g3', 'gif', 'heic', 'heics', 'heif', 'heifs', 'hej2', 'hsj2', 'ico', 'ief', 'j2k', 'jfi', 
-    'jfif', 'jhc', 'jif', 'jls', 'jng', 'jp2', 'jpe', 'jpeg', 'jpf', 'jpg', 'jpg2', 'jph', 'jpm', 'jpx', 'jxr', 'jxra', 
-    'jxrs', 'jxs', 'jxsc', 'jxsi', 'jxss', 'ktx', 'ktx2', 'mdi', 'mj2', 'mmr', 'mng', 'npx', 'pbm', 'pct', 'pcx', 'pgm', 
-    'pic', 'png', 'pnm', 'ppm', 'psd', 'pti', 'ras', 'rgb', 'rlc', 'sgi', 'sid', 'sub', 'svg', 'svgz', 't38', 'tap', 
+const imageExtensions =  new Set(['3ds', 'apng', 'avci', 'avcs', 'avif', 'avifs', 'azv', 'b16', 'bmp', 'btif', 'cgm',
+    'cmx', 'dds', 'dib', 'djv', 'djvu', 'drle', 'dwg', 'dxf', 'emf', 'exr', 'fbs', 'fh', 'fh4', 'fh5', 'fh7', 'fhc',
+    'fits', 'fpx', 'fst', 'g3', 'gif', 'heic', 'heics', 'heif', 'heifs', 'hej2', 'hsj2', 'ico', 'ief', 'j2k', 'jfi',
+    'jfif', 'jhc', 'jif', 'jls', 'jng', 'jp2', 'jpe', 'jpeg', 'jpf', 'jpg', 'jpg2', 'jph', 'jpm', 'jpx', 'jxr', 'jxra',
+    'jxrs', 'jxs', 'jxsc', 'jxsi', 'jxss', 'ktx', 'ktx2', 'mdi', 'mj2', 'mmr', 'mng', 'npx', 'pbm', 'pct', 'pcx', 'pgm',
+    'pic', 'png', 'pnm', 'ppm', 'psd', 'pti', 'ras', 'rgb', 'rlc', 'sgi', 'sid', 'sub', 'svg', 'svgz', 't38', 'tap',
     'tfx', 'tga', 'tif', 'tiff', 'uvg', 'uvi', 'uvvg', 'uvvi', 'vtf', 'wbmp', 'wdp', 'webp', 'wmf', 'xbm', 'xif', 'xpm',
     'xwd'
 ]);
@@ -49,10 +49,14 @@ export function executeCompareCommand(cmd: CompareCommand, opts?: SpawnOptions):
     return new Promise((resolve, reject) => {
         let spawnOptions: SpawnOptions;
 
+        let env = { ...process.env };
+        delete env['GDK_PIXBUF_MODULE_FILE'];
+
         if (typeof opts === 'undefined') {
             spawnOptions = {
                 detached: true,
                 stdio: 'ignore',
+                env: env,
             };
         } else {
             spawnOptions = opts;
@@ -85,13 +89,13 @@ export function executeCompareCommand(cmd: CompareCommand, opts?: SpawnOptions):
 }
 
 export function prepareCompareCommand(
-    tool: ExternalTool, 
+    tool: ExternalTool,
     data: CompareItem[] | { items: CompareItem[] }
 ): CompareCommand {
 
     const items: CompareItem[] = Array.isArray(data) ? data : data.items;
     let args: string[];
-    
+
     if (tool.args.length > 0) {
         // Process args template
         args = processArgs(tool.args, items);
@@ -109,7 +113,7 @@ export function prepareCompareCommand(
 export async function prepareCompareTask(items: unknown): Promise<CompareTask> {
     // Normalize input
     const compareItems = await asCompareItems(items);
-    
+
     // Determine what mode we are in
     const isRemote = hasRemoteItems(compareItems);
 
@@ -139,7 +143,7 @@ function replaceArg(arg: string, items: CompareItem[]): { isSkip: boolean, resul
 
     const result = arg.replace(regexp, (_match, itemNumber, _offset, _string) => {
         const index = parseInt(itemNumber, 10) - 1;
-        
+
         if (index >= 0 && index <= lastIndex) {
             return items[index].uri.fsPath;
         } else {
@@ -159,7 +163,7 @@ function processArgs(args: ExternalToolArgs, items: CompareItem[], depth = 0): s
         for (const arg of args) {
             if (Array.isArray(arg)) {
                 const subArgs = processArgs(arg, items, depth + 1);
-                
+
                 // Flatten subargs
                 for (const subArg of subArgs) {
                     result.push(subArg);
@@ -204,7 +208,7 @@ function determineCompares(items: CompareItem[]): Compares {
     if (items.length >= 2) {
         const item = items[0];
         kind = item.kind;
-        
+
         // First item's kind determines what we compare
         switch (kind) {
             case 'folder':
@@ -214,7 +218,7 @@ function determineCompares(items: CompareItem[]): Compares {
             case 'image':
                 compares = 'images';
                 break;
-            
+
             default:
                 compares = 'text';
                 break;
@@ -228,7 +232,7 @@ function determineCompares(items: CompareItem[]): Compares {
         }
 
         return compares;
-        
+
     } else {
         throw new ErrorWithData('Expected an array of at least 2 items', {scope: 'compare.determineCompares', data: items});
     }
@@ -272,7 +276,7 @@ function determineKind(uri: Uri, type: FileType): CompareItemKind {
         case FileType.Directory:
             kind = 'folder';
             break;
-        
+
         default:
             kind = isImage(uri) ? 'image' : 'file';
             break;
