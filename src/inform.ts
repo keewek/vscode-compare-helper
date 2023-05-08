@@ -20,7 +20,7 @@ export class WhatIsNewInformer implements InformerInterface {
 
     constructor(context: ExtensionContext, extension: Extension<any> | undefined, log: Logger) {
         this._context = context;
-        
+
         if (typeof extension !== 'undefined') {
             this._extensionId = extension.id;
             this._extensionVersion = extension.packageJSON.version;
@@ -40,7 +40,7 @@ export class WhatIsNewInformer implements InformerInterface {
     get shouldInform(): boolean {
         if (typeof this._shouldInform === 'undefined') {
             this._shouldInform = this.processVersion();
-        } 
+        }
 
         return this._shouldInform;
     }
@@ -59,7 +59,11 @@ export class WhatIsNewInformer implements InformerInterface {
         const storedVersion = this.getStoredVersion();
         let shouldInform: boolean;
 
-        if (currentVersion !== storedVersion) {
+        if (storedVersion === undefined) {
+            shouldInform = false;
+            this._log.info(`Current version has changed: 'undefined' ⟶ '${currentVersion}'`);
+            this.setStoredVersion(currentVersion);
+        } else if (currentVersion !== storedVersion) {
             shouldInform = true;
             this._log.info(`Current version has changed: '${storedVersion}' ⟶ '${currentVersion}'`);
             this.setStoredVersion(currentVersion);
@@ -77,5 +81,9 @@ export class WhatIsNewInformer implements InformerInterface {
     private setStoredVersion(value: string): Thenable<void> {
         return this._context.globalState.update(`${this._extensionId}.${this._versionKey}`, value);
     }
+
+    // unsetStoredVersion(): Thenable<void> {
+    //     return this._context.globalState.update(`${this._extensionId}.${this._versionKey}`, undefined);
+    // }
 
 }
