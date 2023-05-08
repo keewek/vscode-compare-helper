@@ -46,6 +46,7 @@ export class WhatIsNewInformer implements InformerInterface {
     }
 
     inform(): Thenable<unknown> {
+        this._shouldInform = false;
         return this.showPreview();
     }
 
