@@ -2,7 +2,7 @@
 	"name": "compare-helper",
 	"displayName": "Compare Helper",
 	"description": "Compare files or folders via configured external tools",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"publisher": "keewek",
 	"license": "SEE LICENSE IN LICENSE",
 	"author": {
