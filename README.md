@@ -21,9 +21,9 @@ Extension adds a new submenu `Compare (External)`
     ![](assets/docs/gui_compare_with.png)
 
 ### Remote Development support
-  
+
   - Remote `Text` files
-    
+
     Comparison is possible, changes made by external tools are synced back with `editor`.
 
   - Remote `Image` files
@@ -46,7 +46,7 @@ Extension is fully dependent upon installed external tools. Configure them as ne
 
 This extension contributes the following settings:
 
-- `compareHelper.defaultExternalTools`: default tools to use 
+- `compareHelper.defaultExternalTools`: default tools to use
 
     For example:
 
@@ -101,15 +101,15 @@ This extension contributes the following settings:
     ]
     ```
 
-    | Property | Type                 | Optional | Default                       | Description 
-    | -------- | ---------------------| :------: | :---------------------------: | ------------ 
+    | Property | Type                 | Optional | Default                       | Description
+    | -------- | ---------------------| :------: | :---------------------------: | ------------
     | name     | string               |          |                               | Used in GUI and as ID for default settings. Must be a unique value
     | path     | string               |          |                               | Absolute or relative path to the executable
     | args     | (string \| args)[]   |    ✔     |           *SPECIAL*           | See [Args](#Args) bellow
     | compares | string[]             |    ✔     | ['folders', 'images', 'text'] | Specifies what kind of items a tool can handle. Allowed values: "folders", "images", "text"
-    
+
     > ### Args
-    > 
+    >
     > When args array is empty or missing all selected items are used as args, one item per argument.
     >
     > The following template `${FOLDER_ITEM_n}` where n ≥ 1 can be used to refer to the selected item. Items are in click order.
@@ -126,9 +126,9 @@ This extension contributes the following settings:
     >     "${FOLDER_ITEM_4}"  // merge
     > ]
     > ```
-    > 
+    >
     > With only two selected items args will be `["path/to/item/1", "path/to/item/2"]`
-    > 
+    >
     > ### Nested Args
     >
     > Arguments could be nested. An **entire nested arg and all its children** is ignored when template refers to an item out of range.
@@ -155,15 +155,15 @@ This extension contributes the following settings:
     > With only two selected items args will be `["path/to/item/1", "path/to/item/2"]`
     >
     > With four selected items args will be flatten to:
-    > 
+    >
     > ```json
     > [
     >     "path/to/item/1",
     >     "path/to/item/2",
     >     "path/to/item/3",
     >     "--out",
-    >     "path/to/item/4", 
-    >     "-L", 
+    >     "path/to/item/4",
+    >     "-L",
     >     "Label for Base",
     >     "-L",
     >     "Label for Left",
@@ -198,10 +198,10 @@ This extension contributes the following settings:
 
 ## Latest Version
 
-### 1.1.0
-#### Added
+### 1.1.1
+### Fixed
 
-- [Remote Development support](#Remote-Development-support)
+- Compatibility issue with snap version of VS Code 1.78.0
 
 See [CHANGELOG.md](CHANGELOG.md) for complete release notes.
 

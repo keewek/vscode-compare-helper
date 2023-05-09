@@ -2,24 +2,9 @@
 
 # [Compare Helper](https://marketplace.visualstudio.com/items?itemName=keewek.compare-helper)
 
-## What is new in `1.1.0`
+## What is new in `1.1.1`
 
-### Added
+### Fixed
 
-- Remote Development support
-  
-  - Remote `Text` files
-    
-    Comparison is possible, changes made by external tools are synced back with `editor`.
+- Compatibility issue with snap version of VS Code 1.78.0
 
-  - Remote `Image` files
-
-    Comparison is possible, but changes are **ignored**. Further releases will feature an option to transfer changed images back to the original remote location.
-
-  - Remote `Folders`
-
-    Comparison is not possible.
-
-  ![](https://github.com/keewek/vscode-compare-helper/raw/main/assets/docs/710_remote.gif)
-  
-  ![](https://github.com/keewek/vscode-compare-helper/raw/main/assets/docs/remote_sync.png)
